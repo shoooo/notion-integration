@@ -1,6 +1,5 @@
 const { Client } = require("@notionhq/client");
-require('dotenv').config();
-
+require("dotenv").config();
 
 // Init client
 const notion = new Client({
@@ -16,7 +15,20 @@ const getData = async (req, res) => {
   };
 
   const { results } = await notion.request(query);
-  return results
+
+  const data = results.map((page) => {
+    return {
+      data: page,
+      id: page.id,
+      title: page.properties.Name.title[0].text.content,
+      date: page.properties.date.date.start,
+      type: page.properties.type.multi_select[0].name,
+      stage: page.properties.stage.select.name,
+      image: page.properties.image.files[0].file.url,
+    };
+  });
+
+  return data;
 };
 
 module.exports = { getData };
