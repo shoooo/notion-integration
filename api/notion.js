@@ -8,13 +8,15 @@ const notion = new Client({
 
 const database_id = process.env.NOTION_DATABASE_ID;
 
-const getData = async (req, res) => {
-  const query = {
-    path: `databases/${database_id}/query`,
-    method: "POST",
-  };
+const getData = async () => {
+  // const query = {
+  //   path: `databases/${database_id}/query`,
+  //   method: "POST",
+  // };
 
-  const { results } = await notion.request(query);
+  const { results } = await notion.databases.query({
+    database_id: database_id,
+  });
 
   const data = results.map((page) => {
     return {
@@ -31,4 +33,18 @@ const getData = async (req, res) => {
   return data;
 };
 
-module.exports = { getData };
+const updateData = async (page_id) => {
+  const { results } = await notion.pages.update({
+    page_id: page_id,
+    properties: {
+      stage: {
+        select: {
+          name: "公開済み",
+        }
+      },
+    },
+  });
+  return results;
+};
+
+module.exports = { getData, updateData };
